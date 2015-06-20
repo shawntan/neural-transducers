@@ -5,6 +5,12 @@ from theano.printing import Print
 from theano_toolkit import utils as U
 from theano_toolkit.parameters import Parameters
 
+def rev_cumsum(seq):
+    return T.concatenate([
+        T.cumsum(seq[::-1])[::-1],
+        theano.shared(np.float32(0.)).dimshuffle('x'),
+    ])
+
 
 def build(size):
     def init(sequence_length):
@@ -19,7 +25,7 @@ def build(size):
                 initial_V[t+1:]
             ])
 
-            rev_cum_prev_s = T.cumsum(prev_s[::-1])[::-1]
+            rev_cum_prev_s = rev_cumsum(prev_s)[1:]
             to_flip_ = u - rev_cum_prev_s
             to_flip = (to_flip_ > 0) * to_flip_
             new_s_ = prev_s - to_flip
@@ -30,7 +36,7 @@ def build(size):
                 initial_s[t+1:]
             ])
 
-            rev_cum_s = T.cumsum(new_s[::-1])[::-1] + d
+            rev_cum_s = rev_cumsum(new_s)[1:] + d
             flip_score_ = 1 - rev_cum_s
             flip_score = (flip_score_ > 0) * flip_score_
             score = T.min([new_s,flip_score],axis=0)
@@ -43,35 +49,31 @@ def build(size):
 
 
 if __name__ == "__main__":
-    t = T.iscalar('t')
-    v = T.vector('v')
-    d = T.scalar('d')
-    u = T.scalar('u')
 
     stack_init = build(5)
 
     initial_V,initial_s,step = stack_init(10)
 
     V,s,r = step(
-            t = t, v = v, d = d, u = u,
+            t = 0,
+            v = theano.shared(np.random.randn(5)),
+            d = theano.shared(1.), u = theano.shared(0.),
             prev_V = initial_V,
             prev_s = initial_s
         )
 
-    f = theano.function(
-            inputs = [t,v,d,u],
-            outputs = [V,s,r]
+    V,s,r = step(
+            t = 1,
+            v = theano.shared(np.random.randn(5)),
+            d = theano.shared(1.), u = theano.shared(0.),
+            prev_V = V,
+            prev_s = s
         )
 
-    V,s,r = f(
-        np.int32(0),
-        np.random.randn(5).astype(np.float32),
-        np.float32(0.),
-        np.float32(1.),
-    )
+
+    f = theano.function(inputs=[],outputs=[V,s,r])
+    V,s,r = f()
 
     print V
     print s
     print r
-
-
