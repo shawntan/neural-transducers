@@ -6,11 +6,13 @@ from theano_toolkit import utils as U
 from theano_toolkit.parameters import Parameters
 
 def cumsum(sequence):
-    return theano.scan(
+    sumseq,_ = theano.scan(
             lambda x,csum: x+csum,
             sequences = [sequence],
-            output_info = [0]
+            outputs_info = [np.int32(0)]
         )
+    return sumseq
+
 
 def build(size):
     def init(sequence_length):
@@ -26,4 +28,4 @@ def build(size):
 
 
 if __name__ == "__main__":
-    print cumsum(np.arange(10)).eval()
+    print cumsum(np.arange(10,dtype=np.int32)).eval()
