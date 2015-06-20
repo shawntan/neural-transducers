@@ -51,7 +51,7 @@ def build_step(P,name,input_size,hidden_size):
 	b_f = biases[1*hidden_size:2*hidden_size] 
 	b_c = biases[2*hidden_size:3*hidden_size]
 	b_o = biases[3*hidden_size:4*hidden_size]
-	def step(x,prev_cell,prev_hid):
+	def step(x,prev_cell,prev_hidden):
 		transformed_x = T.dot(x,P[name_W_input])
 
 		x_i = transformed_x[0*hidden_size:1*hidden_size]
@@ -59,7 +59,7 @@ def build_step(P,name,input_size,hidden_size):
 		x_c = transformed_x[2*hidden_size:3*hidden_size]
 		x_o = transformed_x[3*hidden_size:4*hidden_size]
 
-		transformed_hid = T.dot(prev_hid,P[name_W_hidden])
+		transformed_hid = T.dot(prev_hidden,P[name_W_hidden])
 		h_i = transformed_hid[0*hidden_size:1*hidden_size]
 		h_f = transformed_hid[1*hidden_size:2*hidden_size]
 		h_c = transformed_hid[2*hidden_size:3*hidden_size]
