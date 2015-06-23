@@ -17,7 +17,7 @@ def build(P, input_size, controller_size, stack_size, output_size):
     )
     stack_init = stack.build(size=stack_size)
 
-    P.W_controller_output = np.random.randn(
+    P.W_controller_output = 0.0 * np.random.randn(
         controller_size,
         output_size + stack_size + 1 + 1
     ).astype(np.float32)
@@ -28,7 +28,7 @@ def build(P, input_size, controller_size, stack_size, output_size):
     init_controller_hidden = np.zeros((controller_size,), dtype=np.float32)
     init_stack_r = np.zeros((stack_size,), dtype=np.float32)
 
-    def predict(X):
+    def predict(X,aux={}):
         init_stack_V, init_stack_s, stack_step = stack_init(X.shape[0])
 
         def step(x, t,
@@ -58,7 +58,7 @@ def build(P, input_size, controller_size, stack_size, output_size):
                 prev_V=prev_V, prev_s=prev_s
             )
 
-            return controller_cell, controller_hidden, V, s, r, output
+            return controller_cell, controller_hidden, V, s, r, controller_output, output
         sequences, _ = theano.scan(
             step,
             sequences=[X, T.arange(X.shape[0])],
@@ -68,10 +68,12 @@ def build(P, input_size, controller_size, stack_size, output_size):
                 init_stack_V,
                 init_stack_s,
                 init_stack_r,
+                None,
                 None
             ]
         )
         outputs = sequences[-1]
+        aux['controller_output'] = sequences[-2]
         return outputs
     return predict
 
