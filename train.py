@@ -6,7 +6,6 @@ from theano_toolkit import utils as U
 from theano_toolkit import updates 
 from theano_toolkit.parameters import Parameters
 from theano_toolkit import hinton
-from theano_toolkit.cache import cache
 import model
 
 def clip(delta,thresh):
@@ -73,12 +72,13 @@ if __name__ == "__main__":
     acc,update,test = make_train_functions()
     import tasks
     error = np.inf
+    count = 0
     while error > 0.01:
 #        length = np.random.randint(8 - 8) + 8
         total_error = 0
         total = 0
         for _ in xrange(10):
-            x,y = tasks.reverse(128,1)
+            x,y = tasks.reverse(128,3)
 #            print x
 #            print (129 + y)%129
             total_error += acc(x,y)
@@ -86,4 +86,8 @@ if __name__ == "__main__":
         error = total_error / total
         print error 
         update()
-        print
+        count += 1
+        if count % 20 == 0:
+            x,y = tasks.reverse(128,10)
+            print y[-(y.shape[0]/2):]
+            print test(x)
