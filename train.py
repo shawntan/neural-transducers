@@ -20,19 +20,22 @@ def clip(delta,thresh):
 
 def make_train_functions():
     P = Parameters()
-    X = T.bmatrix('X')
-    Y = T.bmatrix('Y')
+    X = T.bvector('X')
+    Y = T.ivector('Y')
     aux = {}
+
     predict = model.build(
         P,
-        input_size=8,
+        input_size=128,
+        embedding_size=64,
         controller_size=256,
         stack_size=256,
-        output_size=8,
+        output_size=128,
     )
 
-    output = T.nnet.sigmoid(predict(X,aux=aux))
-    error = - T.sum(Y * T.log(output) + (1-Y) * T.log(1-output),axis=1)
+    output = predict(X,aux=aux)
+    error = - T.log(output[T.arange(Y.shape[0]),((128+1 + Y)%(128+1))])
+    error = error[-(Y.shape[0]/2):]
     parameters = P.values()
     gradients = T.grad(T.sum(error),wrt=parameters)
     shapes = [ p.get_value().shape for p in parameters ]
@@ -57,12 +60,12 @@ def make_train_functions():
         )
     update = theano.function(
             inputs=[],
-            updates=updates.rmsprop(parameters,avg_grads) + acc_clear
+            updates=updates.rmsprop(parameters,avg_grads,learning_rate=1e-3) + acc_clear
         )
 
     test = theano.function(
             inputs=[X],
-            outputs=T.nnet.sigmoid(aux['controller_output']),
+            outputs=T.argmax(output,axis=1)[-(X.shape[0]/2):],
         )
     return acc,update,test
 
@@ -71,15 +74,16 @@ if __name__ == "__main__":
     import tasks
     error = np.inf
     while error > 0.01:
-        length = np.random.randint(64 - 8) + 8
+#        length = np.random.randint(8 - 8) + 8
+        total_error = 0
+        total = 0
         for _ in xrange(10):
-            x,y = tasks.copy(7,length)
-            error = acc(x,y)
-            print error
+            x,y = tasks.reverse(128,1)
+#            print x
+#            print (129 + y)%129
+            total_error += acc(x,y)
+            total += 1
+        error = total_error / total
+        print error 
         update()
         print
-
-    x,y = tasks.copy(7,20)
-    print hinton.plot(test(x))
-
-
