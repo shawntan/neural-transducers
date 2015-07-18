@@ -39,9 +39,9 @@ def build_step(P, name, input_size, hidden_size):
     name_W_hidden = "W_%s_hidden" % name
     name_W_cell = "W_%s_cell" % name
     name_b = "b_%s" % name
-    P[name_W_input] = (0.1 * 2) * (np.random.randn(input_size, hidden_size * 4) - 0.5)
-    P[name_W_hidden] = (0.1 * 2) * (np.random.randn(hidden_size, hidden_size * 4) - 0.5)
-    P[name_W_cell] = (0.1 * 2) * (np.random.randn(hidden_size, hidden_size * 3) - 0.5)
+    P[name_W_input] = (0.1 * 2) * (np.random.rand(input_size, hidden_size * 4) - 0.5)
+    P[name_W_hidden] = (0.1 * 2) * (np.random.rand(hidden_size, hidden_size * 4) - 0.5)
+    P[name_W_cell] = (0.1 * 2) * (np.random.rand(hidden_size, hidden_size * 3) - 0.5)
 
     bias_init = np.zeros((hidden_size * 4,), dtype=np.float32)
     bias_init[1 * hidden_size:2 * hidden_size] = 3.

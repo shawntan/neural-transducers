@@ -49,7 +49,7 @@ def make_train_functions():
     acc_clear = [ (a,np.float32(0) * a) for a in acc_grads ] +\
                 [ (count,np.int32(0)) ]
     avg_grads = [ (g / count) for g in acc_grads ]
-    avg_grads = [ clip(g,1) for g in acc_grads ]
+    avg_grads = [ clip(g,10) for g in acc_grads ]
 
 
     acc = theano.function(
@@ -59,7 +59,7 @@ def make_train_functions():
         )
     update = theano.function(
             inputs=[],
-            updates=updates.rmsprop(parameters,avg_grads,learning_rate=1e-3) + acc_clear
+            updates=updates.rmsprop(parameters,avg_grads,learning_rate=1e-4) + acc_clear
         )
 
     test = theano.function(
@@ -74,11 +74,11 @@ if __name__ == "__main__":
     error = np.inf
     count = 0
     while error > 0.01:
-#        length = np.random.randint(8 - 8) + 8
+        length = np.random.randint(64 - 8) + 8
         total_error = 0
         total = 0
         for _ in xrange(10):
-            x,y = tasks.reverse(128,3)
+            x,y = tasks.reverse(128,length)
 #            print x
 #            print (129 + y)%129
             total_error += acc(x,y)
