@@ -5,19 +5,20 @@ from theano.printing import Print
 from theano_toolkit import utils as U
 from theano_toolkit.parameters import Parameters
 
+def rectify(x):
+    return (x > 0) * x
 
 def rev_cumsum(seq):
+    seq = T.concatenate([np.array([0],dtype=np.float32),seq])
     cumsum,_ = theano.scan(
             lambda x,acc: acc + x,
             sequences=seq,
             outputs_info=[np.float32(0.)],
             go_backwards=True
         )
-    return cumsum[::-1]
+    return cumsum[1:][::-1]
 #    return T.cumsum(seq[::-1])[::-1]
 
-def rectify(x):
-    return (x > 0) * x
 def build(size):
     def init(sequence_length):
         initial_V = T.alloc(np.float32(0), sequence_length, size)
