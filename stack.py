@@ -7,7 +7,6 @@ from theano_toolkit.parameters import Parameters
 
 
 def rev_cumsum(seq):
-    """
     cumsum,_ = theano.scan(
             lambda x,acc: acc + x,
             sequences=seq,
@@ -15,8 +14,8 @@ def rev_cumsum(seq):
             go_backwards=True
         )
     return cumsum[::-1]
-    """
-    return T.cumsum(seq[::-1])[::-1]
+#    return T.cumsum(seq[::-1])[::-1]
+
 def rectify(x):
     return (x > 0) * x
 def build(size):
