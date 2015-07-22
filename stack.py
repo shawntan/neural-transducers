@@ -9,14 +9,17 @@ def rectify(x):
     return (x > 0) * x
 
 def rev_cumsum(seq):
-    seq = T.concatenate([np.array([0],dtype=np.float32),seq])
     cumsum,_ = theano.scan(
             lambda x,acc: acc + x,
             sequences=seq,
             outputs_info=[np.float32(0.)],
             go_backwards=True
         )
-    return cumsum[:-1][::-1]
+    return T.switch(
+            T.ge(seq.shape[0],0),
+            cumsum,
+            np.float32(0.)
+        )
 #    return T.cumsum(seq[::-1])[::-1]
 
 def build(size):
