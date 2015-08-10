@@ -49,7 +49,7 @@ def make_train_functions():
     acc_clear = [ (a,np.float32(0) * a) for a in acc_grads ] +\
                 [ (count,np.int32(0)) ]
     avg_grads = [ (g / count) for g in acc_grads ]
-    avg_grads = [ clip(g,10) for g in acc_grads ]
+    avg_grads = [ clip(g,1) for g in acc_grads ]
 
 
     acc = theano.function(
