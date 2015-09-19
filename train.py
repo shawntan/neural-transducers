@@ -59,7 +59,7 @@ def make_train_functions():
         )
     update = theano.function(
             inputs=[],
-            updates=updates.rmsprop(parameters,avg_grads,learning_rate=1e-4) + acc_clear
+            updates=updates.adadelta(parameters,avg_grads,learning_rate=1e-8) + acc_clear
         )
 
     test = theano.function(

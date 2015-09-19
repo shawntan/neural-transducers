@@ -9,14 +9,10 @@ def rectify(x):
     return (x > 0) * x
 
 def rev_cumsum(seq):
-#    cumsum,_ = theano.scan(
-#            lambda x,acc: acc + x,
-#            sequences=seq,
-#            outputs_info=[np.float32(0.)],
-#            go_backwards=True
-#        )
-#    return cumsum
-    return T.cumsum(seq[::-1])[::-1]
+    idxs = T.arange(seq.shape[0])
+    cumsum_matrix = idxs.dimshuffle('x',0) <= idxs.dimshuffle(0,'x')
+    
+    return T.dot(seq,cumsum_matrix)
 
 def build(size):
     def init(sequence_length):
@@ -56,6 +52,7 @@ if __name__ == "__main__":
     #            rev_cumsum(T.arange(10)[1:]),
     #            [np.float32(0.)]
     #        ]).eval()
+    print rev_cumsum(T.arange(10)).eval()
     stack_init = build(5)
     initial_V, initial_s, step = stack_init(10)
     V,s = initial_V,initial_s
