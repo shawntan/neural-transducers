@@ -61,12 +61,12 @@ if __name__ == "__main__":
     initial_V, initial_s, step = stack_init(10)
     V,s = initial_V,initial_s
 
-    for t,(push,pop) in enumerate([ (1,0),(1,0),(0,1),(1,0),(1,0),(0,1),(0,1) ]):
+    for t,(push,pop) in enumerate([ (1,0),(1,0),(0,1),(1,0),(1,0),(0,1),(0,1),(1,0)]):
         V, s, r = step(
             t=t,
             v=theano.shared(np.random.randn(5).astype(np.float32)),
-            d=theano.shared(np.float32(push)),
-            u=theano.shared(np.float32(pop)),
+            d=theano.shared(np.float32(push * 0.99)),
+            u=theano.shared(np.float32(pop * 0.99)),
             prev_V=V,
             prev_s=s
         )

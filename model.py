@@ -52,7 +52,10 @@ def build(P, input_size, embedding_size, controller_size, stack_size, output_siz
                 P.b_controller_output
 
             output = controller_output[:softmax_output_size]
-            v      = controller_output[softmax_output_size:softmax_output_size + stack_size]
+            v      = T.tanh(controller_output[
+                        softmax_output_size:
+                        softmax_output_size + stack_size
+                    ])
             flags = T.nnet.sigmoid(controller_output[-2:])
 
             V, s, r = stack_step(
