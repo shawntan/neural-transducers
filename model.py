@@ -7,7 +7,7 @@ from theano_toolkit.parameters import Parameters
 
 import lstm
 import stack
-
+print __name__
 
 def build(P, input_size, embedding_size, controller_size, stack_size, output_size):
     softmax_output_size = output_size + 1
